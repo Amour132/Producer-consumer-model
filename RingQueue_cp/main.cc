@@ -8,7 +8,7 @@ void* consume_routine(void* arg)
   RingQueue *q = (RingQueue*)arg;
   while(1)
   {
-    q->PopData(d);
+    q->PopData(data);
   }
 }
 

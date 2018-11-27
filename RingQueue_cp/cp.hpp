@@ -8,7 +8,8 @@
 #include <unistd.h>
 #include <semaphore.h>
 
-using namespace std;
+using std::cout;
+using std::endl;
 
 class RingQueue
 {
@@ -28,16 +29,39 @@ class RingQueue
       sem_destroy(&data_sem);
     }
 
-    void PushData(int &data)
+    void PushData(const int &data)
     {
-
-
+      P(blank_sem);
+      ring[p_step] = data;
+      cout << "product done,data is :" << data << endl;
+      V(data_sem);
+      p_step++;
+      p_step %= _cap;
     }
-    void PopData(int &data);
+
+    void PopData(int &data)
+    {
+      P(data_sem);
+      data = ring[c_step];
+      cout << "consume done,data is :" << data << endl;
+      V(blank_sem);
+      c_step++;
+      c_step %= _cap;
+    }
   private:
 
+    void P(sem_t& sem)
+    {
+      sem_wait(&sem);
+    }
+
+    void V(sem_t& sem)
+    {
+      sem_post(&sem);
+    }
+
   private:
-    vector<int>ring;
+    std::vector<int>ring;
     int _cap;
     sem_t blank_sem;
     sem_t data_sem;
